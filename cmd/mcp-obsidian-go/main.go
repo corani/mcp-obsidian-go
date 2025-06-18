@@ -66,6 +66,34 @@ func main() {
 
 	tools.Register(srv, obs)
 
+	// TODO(daniel): probably shouldn't use a lambda here, and we should check the request params.
+	srv.AddPrompt(mcp.NewPrompt("instructions"),
+		func(ctx context.Context, request mcp.GetPromptRequest) (*mcp.GetPromptResult, error) {
+			return mcp.NewGetPromptResult("instructions", []mcp.PromptMessage{
+				mcp.NewPromptMessage(mcp.RoleUser, mcp.NewTextContent(instructions)),
+			}), nil
+		})
+
+	// TODO(daniel): probably shouldn't use a lambda here, and we should check the request params.
+	srv.AddResource(mcp.NewResource("file:///mcpserver.log", "server log"),
+		func(ctx context.Context, request mcp.ReadResourceRequest) ([]mcp.ResourceContents, error) {
+			logfile.Sync()
+
+			// TODO(daniel): reading a file that's open for writing is a bad idea, but this is just a demo.
+			bs, err := os.ReadFile(logfile.Name())
+			if err != nil {
+				return nil, fmt.Errorf("failed to read log file: %w", err)
+			}
+
+			contents := mcp.TextResourceContents{
+				Text:     string(bs),
+				URI:      request.Params.URI,
+				MIMEType: "text/plain",
+			}
+
+			return []mcp.ResourceContents{contents}, nil
+		})
+
 	sse := server.NewSSEServer(srv,
 		server.WithSSEEndpoint("/mcp"),
 	)
