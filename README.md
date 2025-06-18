@@ -75,3 +75,7 @@ OBSIDIAN_API_KEY="<your-obsidian-api-key>"
 ```
 
 These are required for connecting to the Obsidian Local REST API plugin.
+
+## 📄 License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
