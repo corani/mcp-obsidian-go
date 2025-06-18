@@ -1,0 +1,4 @@
+run
+.env
+.mcphost.yml
+mcpserver.log
